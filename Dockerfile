@@ -1,11 +1,11 @@
-# Usa una imagen base de Java
+FROM maven:3.9-amazoncorretto-21-al2023 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
 FROM openjdk:21-slim
-
-# Copia el jar construido al contenedor
-COPY target/config-server*.jar config-server.jar
-
-# Expone el puerto 8888
+WORKDIR /app
+COPY --from=build /app/target/config-server*.jar config-server.jar
 EXPOSE 8888
-
-# Define el entrypoint para iniciar la aplicación
 ENTRYPOINT ["java", "-jar", "config-server.jar"]
